@@ -72,7 +72,13 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+
+
 def depthFirstSearch(problem):
+
+    "Primeiro trabalho de IIA,
+    "Paulo Mauricio Costa Lopes, 18/0112520
+    "Gabriel de Sousa Vieira,    16/0006350
 
 
     """
@@ -89,7 +95,7 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    "util.raiseNotDefined()"
+
 
     from util import Stack
 
@@ -147,6 +153,11 @@ def depthFirstSearch(problem):
 
     return path
 
+
+
+
+
+
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
@@ -167,7 +178,92 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    "util.raiseNotDefined()"
+
+    from util import PriorityQueue
+
+    current = problem.getStartState()
+    explored = []
+
+    """
+    Nodes is a list of dictionary to store the current node, previous nodes,
+    action, if the node is expanded/traveled, and the cost so far
+    """
+    nodes = []
+    nodes.append({'Current': current, 'Previous': None, 'Action': None, 'Traveled': False, 'Cost': 0})
+
+    stack = PriorityQueue()
+    stack.push(current,0)
+
+    """
+    pathCur is the current node used in path tracing
+    """
+    pathCur = None
+
+    while not stack.isEmpty():
+        current = stack.pop()
+        if current in explored:
+            continue
+
+        explored.append(current)
+
+        potentialNodes = []
+        for node in nodes:
+            if node['Current'] == current:
+                potentialNodes.append(node)
+
+        """
+        A* always travel node with the smallest cost, so current node is always
+        the one with smallest cost
+        """
+        if len(potentialNodes) > 1:
+            smallNode = potentialNodes[0]
+            for node in potentialNodes:
+                if smallNode['Cost'] > node['Cost']:
+                    smallNode = node
+            currNode = smallNode
+        else:
+            currNode = potentialNodes[0]
+
+        currNode['Traveled'] = True
+
+        """
+        If current node is the goal, set pathCur to current node and break loop
+        """
+        if problem.isGoalState(current):
+            pathCur = currNode
+            break
+
+        successors = problem.getSuccessors(current)
+        for successor in successors:
+            if successor[0] not in explored:
+                costSoFar = successor[2] + currNode['Cost']
+                costPlusHeuristic = costSoFar + heuristic(successor[0],problem)
+                nodes.append({'Current': successor[0], 'Previous': current, 'Action': successor[1], 'Traveled': False, 'Cost': costSoFar })
+                stack.push(successor[0],costPlusHeuristic)
+
+    """
+    Path tracing from the goal/end node to the starting node using previous
+    """
+    path = []
+    while pathCur:
+        if not pathCur['Previous']:
+            break
+        path.insert(0, pathCur['Action'])
+        potentialPath = []
+        for node in nodes:
+            if node['Current'] == pathCur['Previous'] and node['Traveled']:
+                potentialPath.append(node)
+
+        if len(potentialPath) > 1:
+            pathCur = potentialPath[0]
+            for path in potentialPath:
+                if pathCur['Cost'] > path['Cost']:
+                    pathCur = path
+        else:
+            pathCur = potentialPath[0]
+
+    return path
 
 
 # Abbreviations
