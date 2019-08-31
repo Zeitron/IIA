@@ -73,12 +73,20 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 
+def nullHeuristic(state, problem=None):
+    """
+    A heuristic function estimates the cost from the current state to the nearest
+    goal in the provided SearchProblem.  This heuristic is trivial.
+    """
+    return 0
+
+
+
+"Primeiro trabalho de IIA - UnB"
+"Paulo Mauricio Costa Lopes, 18/0112520"
+"Gabriel de Sousa Vieira,    16/0006350"
 
 def depthFirstSearch(problem):
-
-    "Primeiro trabalho de IIA,
-    "Paulo Mauricio Costa Lopes, 18/0112520
-    "Gabriel de Sousa Vieira,    16/0006350
 
 
     """
@@ -96,19 +104,19 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
 
-
     from util import Stack
+
+    print("Start:", problem.getStartState())
+    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
 
     current = problem.getStartState()
     previous = None
     explored = [(current)]
 
-    """
-    Nodes is a list of dictionary to store the current node, previous nodes,
-    action, and if the node is expanded/traveled
-    """
-    nodes = []
-    nodes.append({'Current': current, 'Previous': None, 'Action': None, 'Traveled': False})
+    "Define a variavel no e seta valores de anterior ação e percuso"
+    no = []
+    no.append({'Current': current, 'Previous': None, 'Action': None, 'Traveled': False})
 
     stack = Stack()
     stack.push(current)
@@ -118,7 +126,7 @@ def depthFirstSearch(problem):
         explored.append((current))
 
         currNode = []
-        for node in nodes:
+        for node in no:
             if node['Current'] == current:
                 currNode.append(node)
 
@@ -130,17 +138,17 @@ def depthFirstSearch(problem):
             currNode[0]['Traveled'] = True
 
         previous = current
-
+        "caso ele tenha chegado no objetivo ele para de procurar o caminho"
         if problem.isGoalState(current):
             break
 
         successors = problem.getSuccessors(current)
         for successor in successors:
             if successor[0] not in explored:
-                nodes.append({'Current': successor[0], 'Previous': current, 'Action': successor[1], 'Traveled': False})
+                no.append({'Current': successor[0], 'Previous': current, 'Action': successor[1], 'Traveled': False})
                 stack.push(successor[0])
     path = []
-    pathCur = nodes[-1]
+    pathCur = no[-1]
     """
     Path tracing from the goal/end node to the starting node using previous
     """
@@ -149,48 +157,25 @@ def depthFirstSearch(problem):
         if not pathCur['Previous']:
             break
         path.insert(0, pathCur['Action'])
-        pathCur = next((item for item in nodes if item['Current'] == pathCur['Previous'] and item['Traveled'] ), None)
+        pathCur = next((item for item in no if item['Current'] == pathCur['Previous'] and item['Traveled'] ), None)
 
     return path
 
 
-
-
-
-
-def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-
-def uniformCostSearch(problem):
-    """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-
-def nullHeuristic(state, problem=None):
-    """
-    A heuristic function estimates the cost from the current state to the nearest
-    goal in the provided SearchProblem.  This heuristic is trivial.
-    """
-    return 0
-
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    "util.raiseNotDefined()"
+
 
     from util import PriorityQueue
 
     current = problem.getStartState()
     explored = []
 
-    """
-    Nodes is a list of dictionary to store the current node, previous nodes,
-    action, if the node is expanded/traveled, and the cost so far
-    """
-    nodes = []
-    nodes.append({'Current': current, 'Previous': None, 'Action': None, 'Traveled': False, 'Cost': 0})
+    "Define a variavel no e seta os valores de no-anterior, ação e percuso para nulo, tal como o custo"
+
+    no = []
+    no.append({'Current': current, 'Previous': None, 'Action': None, 'Traveled': False, 'Cost': 0})
 
     stack = PriorityQueue()
     stack.push(current,0)
@@ -208,14 +193,15 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         explored.append(current)
 
         potentialNodes = []
-        for node in nodes:
+        for node in no:
             if node['Current'] == current:
                 potentialNodes.append(node)
 
         """
-        A* always travel node with the smallest cost, so current node is always
-        the one with smallest cost
+        Com base nas atividades ministradas em aula o algoritmo A* sempre
+        viaja para o No de menor custo
         """
+
         if len(potentialNodes) > 1:
             smallNode = potentialNodes[0]
             for node in potentialNodes:
@@ -227,9 +213,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
         currNode['Traveled'] = True
 
-        """
-        If current node is the goal, set pathCur to current node and break loop
-        """
+        " Caso o no atual seja o no de objetivo ele para o pathcur"
+
         if problem.isGoalState(current):
             pathCur = currNode
             break
@@ -239,7 +224,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             if successor[0] not in explored:
                 costSoFar = successor[2] + currNode['Cost']
                 costPlusHeuristic = costSoFar + heuristic(successor[0],problem)
-                nodes.append({'Current': successor[0], 'Previous': current, 'Action': successor[1], 'Traveled': False, 'Cost': costSoFar })
+                no.append({'Current': successor[0], 'Previous': current, 'Action': successor[1],
+                 'Traveled': False, 'Cost': costSoFar })
                 stack.push(successor[0],costPlusHeuristic)
 
     """
@@ -251,7 +237,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             break
         path.insert(0, pathCur['Action'])
         potentialPath = []
-        for node in nodes:
+        for node in no:
             if node['Current'] == pathCur['Previous'] and node['Traveled']:
                 potentialPath.append(node)
 
@@ -267,7 +253,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
 
 # Abbreviations
-bfs = breadthFirstSearch
+"bfs = breadthFirstSearch"
 dfs = depthFirstSearch
 astar = aStarSearch
-ucs = uniformCostSearch
+"ucs = uniformCostSearch"
