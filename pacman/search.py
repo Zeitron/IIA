@@ -148,16 +148,16 @@ def depthFirstSearch(problem):
                 no.append({'Current': successor[0], 'Previous': current, 'Action': successor[1], 'Traveled': False})
                 stack.push(successor[0])
     path = []
-    pathCur = no[-1]
+    caminho = no[-1]
     """
     Path tracing from the goal/end node to the starting node using previous
     """
-    while pathCur:
-        print ("pathCur = ", pathCur)
-        if not pathCur['Previous']:
+    while caminho:
+        """print ("caminho = ", caminho)"""
+        if not caminho['Previous']:
             break
-        path.insert(0, pathCur['Action'])
-        pathCur = next((item for item in no if item['Current'] == pathCur['Previous'] and item['Traveled'] ), None)
+        path.insert(0, caminho['Action'])
+        caminho = next((item for item in no if item['Current'] == caminho['Previous'] and item['Traveled'] ), None)
 
     return path
 
@@ -181,9 +181,9 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     stack.push(current,0)
 
     """
-    pathCur is the current node used in path tracing
+    caminho is the current node used in path tracing
     """
-    pathCur = None
+    caminho = None
 
     while not stack.isEmpty():
         current = stack.pop()
@@ -213,10 +213,10 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
         currNode['Traveled'] = True
 
-        " Caso o no atual seja o no de objetivo ele para o pathcur"
+        " Caso o no atual seja o no de objetivo ele para o caminho"
 
         if problem.isGoalState(current):
-            pathCur = currNode
+            caminho = currNode
             break
 
         successors = problem.getSuccessors(current)
@@ -232,22 +232,22 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     Path tracing from the goal/end node to the starting node using previous
     """
     path = []
-    while pathCur:
-        if not pathCur['Previous']:
+    while caminho:
+        if not caminho['Previous']:
             break
-        path.insert(0, pathCur['Action'])
+        path.insert(0, caminho['Action'])
         potentialPath = []
         for node in no:
-            if node['Current'] == pathCur['Previous'] and node['Traveled']:
+            if node['Current'] == caminho['Previous'] and node['Traveled']:
                 potentialPath.append(node)
 
         if len(potentialPath) > 1:
-            pathCur = potentialPath[0]
+            caminho = potentialPath[0]
             for path in potentialPath:
-                if pathCur['Cost'] > path['Cost']:
-                    pathCur = path
+                if caminho['Cost'] > path['Cost']:
+                    caminho = path
         else:
-            pathCur = potentialPath[0]
+            caminho = potentialPath[0]
 
     return path
 
