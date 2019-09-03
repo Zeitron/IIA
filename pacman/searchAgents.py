@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -33,7 +33,7 @@ description for details.
 
 Good luck and happy searching!
 """
-
+from decimal import Decimal
 from game import Directions
 from game import Agent
 from game import Actions
@@ -262,6 +262,22 @@ def euclideanHeuristic(position, problem, info={}):
     xy2 = problem.goal
     return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
 
+def randon3Heuristic(position, problem, info={}):
+    "Variação da heuristica euclidiana, so que usa 3 pontos um deles aleatorio"
+    xy1= position
+    xy2= problem.goal
+    return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 + ( (xy2[0]+xy1[1])-(xy2[1]+xy1[0]) )**2  ) ** 0.5
+
+def p_raiz(valor, raiz):
+    "funcao de raiz auxiliar para Minkowski heuristica"
+    valor_raiz = 1 / float(raiz)
+    return round (Decimal(valor) ** Decimal(valor_raiz), 3)
+
+def minkowskiHeuristic(position, problem, info={}):
+    "Minkowski heuristica"
+    xy1 = position
+    xy2 = problem.goal
+    return (p_raiz(sum(pow(abs(a-b), 3) for a, b in zip(xy1, xy2)), 3))
 #####################################################
 # This portion is incomplete.  Time to write code!  #
 #####################################################

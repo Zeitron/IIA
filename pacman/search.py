@@ -47,7 +47,7 @@ class SearchProblem:
 
         For a given state, this should return a list of triples, (successor,
         action, stepCost), where 'successor' is a successor to the current
-        state, 'action' is the action required to get there, and 'stepCost' is
+        state, 'direcao' is the action required to get there, and 'stepCost' is
         the incremental cost of expanding to that successor.
         """
         util.raiseNotDefined()
@@ -88,163 +88,192 @@ def nullHeuristic(state, problem=None):
 
 def depthFirstSearch(problem):
 
-
-    """
-    Search the deepest nodes in the search tree first.
-
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
-
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
-
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    """
-    "*** YOUR CODE HERE ***"
-
     from util import Stack
 
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+    print("Determino o ponto inicial:", problem.getStartState())
+    print("Estou no objetivo?", problem.isGoalState(problem.getStartState()))
+    print("Quais sao os \"vizinhos\":", problem.getSuccessors
+    (problem.getStartState()))
 
-    current = problem.getStartState()
-    previous = None
-    explored = [(current)]
+    atual = problem.getStartState()
+    anterior = None
+    percorrido = [(atual)]
+    """*************************************************************************
 
-    "Define a variavel no e seta valores de anterior ação e percuso"
+        Define a variavel no e seta valores da posicao atual, posicao anterior,
+    direcao e se ja percorreu o caminho
+
+    *************************************************************************"""
     no = []
-    no.append({'Current': current, 'Previous': None, 'Action': None, 'Traveled': False})
+    no.append({'posicao atual': atual, 'posicao anterior': None, 'direcao': None,
+     'percorrido?': False})
 
     stack = Stack()
-    stack.push(current)
+    stack.push(atual)
+
+    """************************************************************************
+
+            Le a posicao do no atual e adiciona o no na lista de nos, posterior-
+        mente ele retira eles da lista de nos e marca que ja percorreu esse no
+
+    *************************************************************************"""
 
     while not stack.isEmpty():
-        current = stack.pop()
-        explored.append((current))
+        atual = stack.pop()
+        percorrido.append((atual))
 
-        currNode = []
+        lista_no = []
         for node in no:
-            if node['Current'] == current:
-                currNode.append(node)
+            if node['posicao atual'] == atual:
+                lista_no.append(node)
 
-        if len(currNode) > 1:
-            for node in currNode:
-                if node['Previous'] == previous:
-                    node['Traveled'] = True
+        if len(lista_no) > 1:
+            for node in lista_no:
+                if node['posicao anterior'] == anterior:
+                    node['percorrido?'] = True
         else:
-            currNode[0]['Traveled'] = True
+            lista_no[0]['percorrido?'] = True
 
-        previous = current
-        "caso ele tenha chegado no objetivo ele para de procurar o caminho"
-        if problem.isGoalState(current):
+        anterior = atual
+    """************************************************************************
+
+            Caso ele tenha chegado no objetivo ele para de procurar o caminho
+
+    *************************************************************************"""
+        if problem.isGoalState(atual):
             break
 
-        successors = problem.getSuccessors(current)
+        successors = problem.getSuccessors(atual)
         for successor in successors:
-            if successor[0] not in explored:
-                no.append({'Current': successor[0], 'Previous': current, 'Action': successor[1], 'Traveled': False})
+            if successor[0] not in percorrido:
+                no.append({'posicao atual': successor[0],
+                 'posicao anterior': atual, 'direcao': successor[1],
+                 'percorrido?': False})
                 stack.push(successor[0])
-    path = []
+    menor_caminho = []
     caminho = no[-1]
-    """
-    Path tracing from the goal/end node to the starting node using previous
-    """
-    while caminho:
-        """print ("caminho = ", caminho)"""
-        if not caminho['Previous']:
-            break
-        path.insert(0, caminho['Action'])
-        caminho = next((item for item in no if item['Current'] == caminho['Previous'] and item['Traveled'] ), None)
+    """*************************************************************************
 
-    return path
+            O caminho é feito a partir do no final ate o no inicial
+
+    *************************************************************************"""
+    while caminho:
+        if not caminho['posicao anterior']:
+            break
+        menor_caminho.insert(0, caminho['direcao'])
+        caminho = next((item for item in no if item['posicao atual'] ==
+        caminho['posicao anterior'] and item['percorrido?'] ), None)
+
+    return menor_caminho
 
 
 def aStarSearch(problem, heuristic=nullHeuristic):
-    """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-
 
     from util import PriorityQueue
 
-    current = problem.getStartState()
-    explored = []
+    print("Determino o ponto inicial:", problem.getStartState())
+    print("Estou no objetivo?", problem.isGoalState(problem.getStartState()))
+    print("Quais sao os \"vizinhos\":", problem.getSuccessors
+    (problem.getStartState()))
 
-    "Define a variavel no e seta os valores de no-anterior, ação e percuso para nulo, tal como o custo"
+    atual = problem.getStartState()
+    percorrido = []
+
+    """*************************************************************************
+
+            Define a variavel no e seta os valores de no-anterior, ação e percu-
+        so para nulo, tal como o custo.
+
+    *************************************************************************"""
 
     no = []
-    no.append({'Current': current, 'Previous': None, 'Action': None, 'Traveled': False, 'Cost': 0})
+    no.append({'posicao atual': atual, 'posicao anterior': None, 'direcao': None,
+    'percorrido?': False, custo: 0})
 
     stack = PriorityQueue()
-    stack.push(current,0)
+    stack.push(atual,0)
 
-    """
-    caminho is the current node used in path tracing
-    """
+
+    """*************************************************************************
+
+            O caminho é o ponto atual do no usado para achar o destino final
+
+    *************************************************************************"""
+
     caminho = None
 
     while not stack.isEmpty():
-        current = stack.pop()
-        if current in explored:
+        atual = stack.pop()
+        if atual in percorrido:
             continue
 
-        explored.append(current)
+        percorrido.append(atual)
 
         potentialNodes = []
         for node in no:
-            if node['Current'] == current:
+            if node['posicao atual'] == atual:
                 potentialNodes.append(node)
 
-        """
-        Com base nas atividades ministradas em aula o algoritmo A* sempre
-        viaja para o No de menor custo
-        """
+    """*************************************************************************
+
+            Com base nas atividades ministradas em aula o algoritmo A* sempre
+        viaja para o No de menor custo, o que caso depende da heuristica usada.
+
+    *************************************************************************"""
+
 
         if len(potentialNodes) > 1:
             smallNode = potentialNodes[0]
             for node in potentialNodes:
-                if smallNode['Cost'] > node['Cost']:
+                if smallNode[custo] > node[custo]:
                     smallNode = node
             currNode = smallNode
         else:
             currNode = potentialNodes[0]
 
-        currNode['Traveled'] = True
+        currNode['percorrido?'] = True
 
-        " Caso o no atual seja o no de objetivo ele para o caminho"
+    """*************************************************************************
 
-        if problem.isGoalState(current):
+            Quebra o laço caso tenha chegado ao objetivo, e entao comeca a calcu-
+        lar o "melhor" custo para o trajeto.
+
+    *************************************************************************"""
+
+        if problem.isGoalState(atual):
             caminho = currNode
             break
 
-        successors = problem.getSuccessors(current)
+    """*************************************************************************
+
+            Trexo que é calculado custo para chegar somado ao custo da Heuristica
+
+    *************************************************************************"""
+        successors = problem.getSuccessors(atual)
         for successor in successors:
-            if successor[0] not in explored:
-                costSoFar = successor[2] + currNode['Cost']
+            if successor[0] not in percorrido:
+                costSoFar = successor[2] + currNode[custo]
                 costPlusHeuristic = costSoFar + heuristic(successor[0],problem)
-                no.append({'Current': successor[0], 'Previous': current, 'Action': successor[1],
-                 'Traveled': False, 'Cost': costSoFar })
+                no.append({'posicao atual': successor[0],
+                'posicao anterior': atual, 'direcao': successor[1],
+                'percorrido?': False, custo: costSoFar })
                 stack.push(successor[0],costPlusHeuristic)
 
-    """
-    Path tracing from the goal/end node to the starting node using previous
-    """
     path = []
     while caminho:
-        if not caminho['Previous']:
+        if not caminho['posicao anterior']:
             break
-        path.insert(0, caminho['Action'])
+        path.insert(0, caminho['direcao'])
         potentialPath = []
         for node in no:
-            if node['Current'] == caminho['Previous'] and node['Traveled']:
+            if node['posicao atual'] == caminho['posicao anterior']
+            and node['percorrido?']:
                 potentialPath.append(node)
 
         if len(potentialPath) > 1:
             caminho = potentialPath[0]
             for path in potentialPath:
-                if caminho['Cost'] > path['Cost']:
+                if caminho[custo] > path[custo]:
                     caminho = path
         else:
             caminho = potentialPath[0]
@@ -253,6 +282,12 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
 
 # Abbreviations
+"""*************************************************************************
+
+        As abreviações não utilizadas foram comentadas
+
+*************************************************************************"""
+
 "bfs = breadthFirstSearch"
 dfs = depthFirstSearch
 astar = aStarSearch
